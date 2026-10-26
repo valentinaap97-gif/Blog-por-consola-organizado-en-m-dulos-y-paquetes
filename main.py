@@ -1,51 +1,35 @@
-"""Archivo principal: coordina el menú y llama a las operaciones del blog."""
+"""Punto de entrada del blog por consola."""
 
-from blog.datos import posts
-from blog.menu import mostrar_menu, pedir_texto
-from blog.operaciones import listar_posts, buscar_por_titulo, filtrar_por_tag
-from blog.validaciones import validar_post
-
-
-def validar_todos(lista):
-    """Valida cada post y muestra cuáles son válidos y cuáles tienen errores."""
-    for i, post in enumerate(lista, start=1):
-        errores = validar_post(post)
-        titulo = post.get("titulo") or "(sin título)" if isinstance(post, dict) else "(no es un post)"
-        if errores:
-            print(f"Post {i} - {titulo}: INVÁLIDO")
-            for error in errores:
-                print(f"   - {error}")
-        else:
-            print(f"Post {i} - {titulo}: válido")
+from blog.datos import cargar_posts, guardar_posts
+from blog.menu import mostrar_menu
+from blog import operaciones
 
 
 def main():
+    blog = cargar_posts()
+
+    acciones = {
+        "1": operaciones.ver_posts,
+        "2": operaciones.buscar_posts,
+        "3": operaciones.filtrar_posts,
+        "4": operaciones.crear_post,
+        "5": operaciones.validar_posts,
+        "6": operaciones.guardar,
+    }
+
     while True:
         opcion = mostrar_menu()
-
-        if opcion == "1":
-            listar_posts(posts)
-        elif opcion == "2":
-            termino = pedir_texto("Término a buscar: ")
-            resultados = buscar_por_titulo(posts, termino)
-            if resultados:
-                listar_posts(resultados)
-            else:
-                print(f"No se encontraron posts con '{termino}' en el título.")
-        elif opcion == "3":
-            tag = pedir_texto("Tag a filtrar: ")
-            resultados = filtrar_por_tag(posts, tag)
-            if resultados:
-                listar_posts(resultados)
-            else:
-                print(f"No hay posts con el tag '{tag}'.")
-        elif opcion == "4":
-            validar_todos(posts)
-        elif opcion == "5":
+        if opcion == "7":
+            if blog.modificado:
+                print("Hay cambios sin guardar. Guardando antes de salir...")
+                guardar_posts(blog)
             print("¡Hasta luego!")
             break
+        accion = acciones.get(opcion)
+        if accion is None:
+            print("Opción inválida. Elegí un número del 1 al 7.")
         else:
-            print("Opción no válida. Elegí un número del 1 al 5.")
+            accion(blog)
 
 
 if __name__ == "__main__":

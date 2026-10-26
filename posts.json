@@ -1,0 +1,50 @@
+[
+    {
+        "id": 1,
+        "titulo": "Aprendiendo Python",
+        "contenido": "Hoy aprendí a manejar listas y diccionarios.",
+        "autor": {
+            "nombre": "Ana López",
+            "email": "ana@ejemplo.com",
+            "bio": "Estudiante de Python y apasionada por el desarrollo web."
+        },
+        "tags": ["python", "tutorial"],
+        "estado": "publicado"
+    },
+    {
+        "id": 2,
+        "titulo": "Mi primer blog por consola",
+        "contenido": "Construí un menú interactivo con input().",
+        "autor": {
+            "nombre": "Ana López",
+            "email": "ana@ejemplo.com",
+            "bio": "Estudiante de Python y apasionada por el desarrollo web."
+        },
+        "tags": ["consola", "python"],
+        "estado": "borrador"
+    },
+    {
+        "id": 3,
+        "titulo": "Introducción al desarrollo web",
+        "contenido": "Un repaso por los conceptos básicos de la web.",
+        "autor": {
+            "nombre": "Ana López",
+            "email": "ana@ejemplo.com",
+            "bio": "Estudiante de Python y apasionada por el desarrollo web."
+        },
+        "tags": ["web"],
+        "estado": "archivado"
+    },
+    {
+        "id": 4,
+        "titulo": "",
+        "contenido": "Este post no tiene título.",
+        "autor": {
+            "nombre": "Ana López",
+            "email": "ana@ejemplo.com",
+            "bio": "Estudiante de Python y apasionada por el desarrollo web."
+        },
+        "tags": ["python"],
+        "estado": "pendiente"
+    }
+]

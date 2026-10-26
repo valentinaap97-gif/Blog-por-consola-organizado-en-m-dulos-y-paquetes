@@ -1,37 +1,79 @@
-"""Operaciones del blog: listado, búsqueda y filtrado."""
+"""Operaciones del menú: piden datos al usuario y llaman a los métodos de Blog."""
+
+from blog.datos import guardar_posts
+from blog.menu import pedir_texto
+from blog.modelos import Autor
+from blog.validaciones import ESTADOS_POST
 
 
-def _nombre_autor(post):
-    """Devuelve el nombre del autor, o un texto aclaratorio si el dato es inválido."""
-    autor = post.get("autor")
-    if isinstance(autor, dict):
-        return autor.get("nombre") or "(sin nombre)"
-    return "(autor inválido)"
+def ver_posts(blog):
+    """Opción 1: muestra todos los posts."""
+    blog.listar_posts()
 
 
-def listar_posts(lista):
-    """Muestra título, autor y estado de cada post."""
-    if not lista:
-        print("No hay posts para mostrar.")
+def buscar_posts(blog):
+    """Opción 2: busca posts por título."""
+    termino = pedir_texto("Título a buscar: ")
+    if not termino:
+        print("Error: tenés que escribir algo para buscar.")
         return
-    for i, post in enumerate(lista, start=1):
-        print(f"{i}. {post.get('titulo') or '(sin título)'}")
-        print(f"   Autor: {_nombre_autor(post)}")
-        print(f"   Estado: {post.get('estado', '(sin estado)')}")
+    resultados = blog.buscar_por_titulo(termino)
+    if not resultados:
+        print(f"No se encontraron posts con '{termino}' en el título.")
+        return
+    blog.listar_posts(resultados)
 
 
-def buscar_por_titulo(lista, termino):
-    """Devuelve los posts cuyo título contiene el término (sin distinguir mayúsculas)."""
-    termino = termino.lower()
-    return [p for p in lista if termino in str(p.get("titulo", "")).lower()]
+def filtrar_posts(blog):
+    """Opción 3: filtra posts por tag."""
+    tag = pedir_texto("Tag a filtrar: ")
+    if not tag:
+        print("Error: tenés que escribir un tag.")
+        return
+    resultados = blog.filtrar_por_tag(tag)
+    if not resultados:
+        print(f"No hay posts con el tag '{tag}'.")
+        return
+    blog.listar_posts(resultados)
 
 
-def filtrar_por_tag(lista, tag):
-    """Devuelve los posts que tienen el tag indicado (sin distinguir mayúsculas)."""
-    tag = tag.lower()
-    resultado = []
-    for p in lista:
-        tags = p.get("tags")
-        if isinstance(tags, list) and tag in [t.lower() for t in tags]:
-            resultado.append(p)
-    return resultado
+def crear_post(blog):
+    """Opción 4: pide los datos y crea un nuevo Post dentro del Blog."""
+    print("\n--- Nuevo post ---")
+    titulo = pedir_texto("Título: ")
+    contenido = pedir_texto("Contenido: ")
+    nombre = pedir_texto("Nombre del autor: ")
+    bio = pedir_texto("Bio del autor (opcional): ")
+    tags_texto = pedir_texto("Tags separados por coma (opcional): ")
+    estado = pedir_texto(f"Estado {ESTADOS_POST} [borrador]: ").lower() or "borrador"
+
+    tags = [t.strip().lower() for t in tags_texto.split(",") if t.strip()]
+    autor = Autor(nombre, bio)
+
+    try:
+        post = blog.crear_post(titulo, contenido, autor, tags, estado)
+    except ValueError as error:
+        print(f"No se pudo crear el post: {error}")
+        return
+    print(f"Post creado con id {post.id}. Recordá guardarlo con la opción 6.")
+
+
+def validar_posts(blog):
+    """Opción 5: indica qué posts son válidos y cuáles tienen errores."""
+    resultados = blog.validar_posts()
+    if not resultados:
+        print("No hay posts para validar.")
+        return
+    for i, (post, errores) in enumerate(resultados, start=1):
+        titulo = str(post.titulo).strip() or "(sin título)"
+        if errores:
+            print(f"{i}. {titulo}: INVÁLIDO")
+            for error in errores:
+                print(f"   - {error}")
+        else:
+            print(f"{i}. {titulo}: válido")
+
+
+def guardar(blog):
+    """Opción 6: guarda los posts en posts.json."""
+    guardar_posts(blog)
